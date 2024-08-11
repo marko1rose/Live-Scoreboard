@@ -50,8 +50,4 @@ public class Scoreboard {
     private boolean matchExists(Match match, String homeTeam, String awayTeam) {
         return match.getHomeTeam().equals(homeTeam) && match.getAwayTeam().equals(awayTeam);
     }
-
-    private boolean listContainsMatch(String homeTeam, String awayTeam) {
-
-    }
 }
