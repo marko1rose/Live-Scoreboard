@@ -35,7 +35,7 @@ for (Match match : summary) {
 
 ### Design Decisions
 - Match start time: The start time of a match is managed using an AtomicLong to ensure uniqueness and order even when matches are started in quick succession.
-- Synchronized Methods: All operations are synchronized, ensuring thread safety when multiple threads interact with the Scoreboard.
+- Synchronized methods: All operations are synchronized, ensuring thread safety when multiple threads interact with the Scoreboard.
 - Validation:
   - Team names are neither null nor blank.
   - Teams cannot be involved in more than one match simultaneously.
