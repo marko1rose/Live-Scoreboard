@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LiveScoreboardTest {
 
@@ -73,4 +74,55 @@ public class LiveScoreboardTest {
         assertEquals("France", summary.get(4).getAwayTeam());
     }
 
+    @Test
+    public void testStartMatchWithTeamAlreadyPlaying() {
+        Scoreboard scoreboard = new Scoreboard();
+        scoreboard.startMatch("Team A", "Team B");
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team A", "Team C"));
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team D", "Team B"));
+    }
+
+    @Test
+    public void testUpdateScoreForNonExistentMatch() {
+        Scoreboard scoreboard = new Scoreboard();
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", 1, 2));
+    }
+
+    @Test
+    public void testFinishNonExistentMatch() {
+        Scoreboard scoreboard = new Scoreboard();
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.finishMatch("Team A", "Team B"));
+    }
+
+    @Test
+    public void testStartMatchWithInvalidTeamNames() {
+        Scoreboard scoreboard = new Scoreboard();
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("", "Team B"));
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team A", null));
+    }
+
+    @Test
+    public void testUpdateScoreWithInvalidValues() {
+        Scoreboard scoreboard = new Scoreboard();
+        scoreboard.startMatch("Team A", "Team B");
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", -1, 2));
+
+        assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", 1, -2));
+    }
+
+    @Test
+    public void testStartMatchAfterFinishingPreviousMatch() {
+        Scoreboard scoreboard = new Scoreboard();
+        scoreboard.startMatch("Team A", "Team B");
+        scoreboard.finishMatch("Team A", "Team B");
+
+        scoreboard.startMatch("Team A", "Team B");
+        assertEquals(1, scoreboard.getSummary().size());
+    }
 }
