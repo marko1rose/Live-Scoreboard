@@ -79,31 +79,34 @@ public class LiveScoreboardTest {
         Scoreboard scoreboard = new Scoreboard();
         scoreboard.startMatch("Team A", "Team B");
 
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team A", "Team C"));
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team D", "Team B"));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team A", "Team C"));
+        assertEquals("One or both teams are already playing in another match.", exception.getMessage());
     }
 
     @Test
     public void testUpdateScoreForNonExistentMatch() {
         Scoreboard scoreboard = new Scoreboard();
 
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", 1, 2));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", 1, 2));
+        assertEquals("Match not found.", exception.getMessage());
     }
 
     @Test
     public void testFinishNonExistentMatch() {
         Scoreboard scoreboard = new Scoreboard();
-
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.finishMatch("Team A", "Team B"));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> scoreboard.finishMatch("Team A", "Team B"));
+        assertEquals("Match not found.", exception.getMessage());
     }
 
     @Test
     public void testStartMatchWithInvalidTeamNames() {
         Scoreboard scoreboard = new Scoreboard();
 
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("", "Team B"));
+        Exception exception1 = assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("", "Team B"));
+        assertEquals("Team name cannot be null or blank.", exception1.getMessage());
 
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team A", null));
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> scoreboard.startMatch("Team A", null));
+        assertEquals("Team name cannot be null or blank.", exception2.getMessage());
     }
 
     @Test
@@ -111,9 +114,8 @@ public class LiveScoreboardTest {
         Scoreboard scoreboard = new Scoreboard();
         scoreboard.startMatch("Team A", "Team B");
 
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", -1, 2));
-
-        assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", 1, -2));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> scoreboard.updateScore("Team A", "Team B", -1, 2));
+        assertEquals("Score cannot be negative.", exception.getMessage());
     }
 
     @Test

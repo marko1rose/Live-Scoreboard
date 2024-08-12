@@ -1,45 +1,47 @@
 package coding.exercise;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
 public class Scoreboard {
     private List<Match> matches;
 
+    private static final String MATCH_NOT_FOUND = "Match not found.";
+
     public Scoreboard() {
         this.matches = Collections.synchronizedList(new ArrayList<>());
     }
 
-    public void startMatch(String homeTeam, String awayTeam) {
-        if (matches.stream().anyMatch(match -> matchExists(match, homeTeam, awayTeam))) {
-            throw new IllegalArgumentException("Match between " + homeTeam + " and " + awayTeam + " is already in progress.");
+    public synchronized void startMatch(String homeTeam, String awayTeam) {
+        if (StringUtils.isAnyBlank(homeTeam, awayTeam)) {
+            throw new IllegalArgumentException("Team name cannot be null or blank.");
         }
 
-        Match match = new Match(homeTeam, awayTeam);
-        matches.add(match);
-    }
-
-    public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        for (Match match : matches) {
-            if (matchExists(match, homeTeam, awayTeam)) {
-                match.updateScore(homeScore, awayScore);
-                return;
-            }
+        if (matches.stream().anyMatch(match -> matchExists(homeTeam, awayTeam))) {
+            throw new IllegalArgumentException("One or both teams are already playing in another match.");
         }
-        throw new IllegalArgumentException("Match not found!");
+        matches.add(new Match(homeTeam, awayTeam));
     }
 
-    public void finishMatch(String homeTeam, String awayTeam) {
-        matches.removeIf(match -> matchExists(match, homeTeam, awayTeam));
+    public synchronized void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+        if (homeScore < 0 || awayScore < 0) {
+            throw new IllegalArgumentException("Score cannot be negative.");
+        }
+
+        Match match = getMatch(homeTeam, awayTeam).orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
+        match.updateScore(homeScore, awayScore);
     }
 
-    public List<Match> getSummary() {
+    public synchronized void finishMatch(String homeTeam, String awayTeam) {
+        Match match = getMatch(homeTeam, awayTeam).orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
+        matches.remove(match);
+    }
+
+    public synchronized List<Match> getSummary() {
         return matches.stream()
                 .sorted(Comparator.comparing(Match::getTotalScore)
                         .reversed()
@@ -47,7 +49,16 @@ public class Scoreboard {
                 .collect(Collectors.toList());
     }
 
-    private boolean matchExists(Match match, String homeTeam, String awayTeam) {
-        return match.getHomeTeam().equals(homeTeam) && match.getAwayTeam().equals(awayTeam);
+    private boolean matchExists(String homeTeam, String awayTeam) {
+        return matches.stream().anyMatch(match ->
+                match.getHomeTeam().equals(homeTeam) ||
+                        match.getAwayTeam().equals(homeTeam) ||
+                        match.getHomeTeam().equals(awayTeam) ||
+                        match.getAwayTeam().equals(awayTeam)
+        );
+    }
+
+    private Optional<Match> getMatch(String homeTeam, String awayTeam) {
+        return matches.stream().filter(match -> match.getHomeTeam().equals(homeTeam) && match.getAwayTeam().equals(awayTeam)).findFirst();
     }
 }

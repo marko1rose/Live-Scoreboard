@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Match {
 
     private static final AtomicLong startTimeCounter = new AtomicLong();
-
     private String homeTeam;
     private String awayTeam;
     private int homeScore;
