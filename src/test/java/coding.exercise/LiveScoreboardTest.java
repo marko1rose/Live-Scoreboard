@@ -58,20 +58,11 @@ public class LiveScoreboardTest {
 
         List<Match> summary = scoreboard.getSummary();
 
-        assertEquals("Uruguay", summary.get(0).getHomeTeam());
-        assertEquals("Italy", summary.get(0).getAwayTeam());
-
-        assertEquals("Spain", summary.get(1).getHomeTeam());
-        assertEquals("Brazil", summary.get(1).getAwayTeam());
-
-        assertEquals("Mexico", summary.get(2).getHomeTeam());
-        assertEquals("Canada", summary.get(2).getAwayTeam());
-
-        assertEquals("Argentina", summary.get(3).getHomeTeam());
-        assertEquals("Australia", summary.get(3).getAwayTeam());
-
-        assertEquals("Germany", summary.get(4).getHomeTeam());
-        assertEquals("France", summary.get(4).getAwayTeam());
+        assertEquals("Uruguay 6 - Italy 6", summary.get(0).toString());
+        assertEquals("Spain 10 - Brazil 2", summary.get(1).toString());
+        assertEquals("Mexico 0 - Canada 5", summary.get(2).toString());
+        assertEquals("Argentina 3 - Australia 1", summary.get(3).toString());
+        assertEquals("Germany 2 - France 2", summary.get(4).toString());
     }
 
     @Test
